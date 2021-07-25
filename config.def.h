@@ -17,7 +17,7 @@ static int nomodbuttons                  = 1;   /* allow client mouse button bin
 #if VANITYGAPS_PATCH
 static const unsigned int gappih         = 30;  /* horiz inner gap between windows */
 static const unsigned int gappiv         = 30;  /* vert inner gap between windows */
-static const unsigned int gappoh         = 50;  /* horiz outer gap between windows and screen edge */
+static const unsigned int gappoh         = 30;  /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov         = 30;  /* vert outer gap between windows and screen edge */
 static const int smartgaps               = 0;   /* 1 means no outer gap when there is only one window */
 #endif // VANITYGAPS_PATCH
@@ -35,9 +35,9 @@ static const char *altbarcmd             = "/home/hliu/.config/polybar/bar.sh"; 
 #if BAR_HOLDBAR_PATCH
 static const int showbar                 = 0;   /* 0 means no bar */
 #else
-static const int showbar                 = 0;   /* 0 means no bar */
+static const int showbar                 = 1;   /* 0 means no bar */
 #endif // BAR_HOLDBAR_PATCH
-static const int topbar                  = 1;   /* 0 means bottom bar */
+static const int topbar                  = 0;   /* 0 means bottom bar */
 #if TAB_PATCH
 /*  Display modes of the tab bar: never shown, always shown, shown only in  */
 /*  monocle mode in the presence of several windows.                        */
@@ -47,7 +47,7 @@ static const int showtab                 = showtab_auto;        /* Default tab b
 static const int toptab                  = False;               /* False means bottom tab bar */
 #endif // TAB_PATCH
 #if BAR_HEIGHT_PATCH
-static const int bar_height              = 0;   /* 0 means derive from font, >= 1 explicit height */
+static const int bar_height              = 20;   /* 0 means derive from font, >= 1 explicit height */
 #endif // BAR_HEIGHT_PATCH
 #if BAR_PADDING_PATCH
 static const int vertpad                 = 10;  /* vertical padding of bar */
@@ -69,7 +69,7 @@ static const int riodraw_matchpid        = 1;  /* 0 or 1, indicates whether to m
 #endif // SWALLOW_PATCH
 #endif // RIODRAW_PATCH
 #if BAR_STATUSPADDING_PATCH
-static const int horizpadbar             = 2;   /* horizontal padding for statusbar */
+static const int horizpadbar             = 0;   /* horizontal padding for statusbar */
 static const int vertpadbar              = 0;   /* vertical padding for statusbar */
 #endif // BAR_STATUSPADDING_PATCH
 #if BAR_STATUSBUTTON_PATCH
@@ -944,9 +944,9 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_Escape,     togglenomodbuttons,     {0} },
 	#endif // NO_MOD_BUTTONS_PATCH
 	#if SCRATCHPADS_PATCH
-	{ MODKEY,                       XK_grave,      togglescratch,          {.ui = 0 } },
-	{ MODKEY|ControlMask,           XK_grave,      setscratch,             {.ui = 0 } },
-	{ MODKEY|ShiftMask,             XK_grave,      removescratch,          {.ui = 0 } },
+	{ MODKEY|ControlMask,           XK_t,          togglescratch,          {.ui = 0 } },
+	{ MODKEY|ControlMask|Mod4Mask,  XK_s,          setscratch,             {.ui = 0 } },
+    { MODKEY|ControlMask|Mod4Mask,  XK_r,          removescratch,          {.ui = 0 } },
 	#endif // SCRATCHPADS_PATCH
 	#if UNFLOATVISIBLE_PATCH
 	{ MODKEY|Mod4Mask,              XK_space,      unfloatvisible,         {0} },
