@@ -47,6 +47,9 @@
 #if BAR_STATUSCOLORS_PATCH
 #include "bar_statuscolors.c"
 #endif
+#if BAR_WINICON_PATCH
+#include "bar_winicon.c"
+#endif
 #if BAR_TABGROUPS_PATCH
 #include "bar_tabgroups.c"
 #endif
@@ -111,6 +114,9 @@
 #endif
 #if DECORATION_HINTS_PATCH
 #include "decorationhints.c"
+#endif
+#if DISTRIBUTETAGS_PATCH
+#include "distributetags.c"
 #endif
 #if DRAGCFACT_PATCH && CFACTS_PATCH
 #include "dragcfact.c"
@@ -295,6 +301,9 @@
 #if ZOOMSWAP_PATCH
 #include "zoomswap.c"
 #endif
+#if XKB_PATCH
+#include "xkb.c"
+#endif
 #if XRDB_PATCH && !BAR_VTCOLORS_PATCH
 #include "xrdb.c"
 #endif
@@ -347,3 +356,4 @@
 #if TILE_LAYOUT
 #include "layout_tile.c"
 #endif
+

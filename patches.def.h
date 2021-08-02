@@ -21,12 +21,37 @@
  */
 #define BAR_AWESOMEBAR_PATCH 0
 
-/* This patch depends on statuscmd patch and adds integration with a (patched) dwmblocks
- * instance to give a clickable status bar.
- * Patch: https://gist.github.com/danbyl/54f7c1d57fc6507242a95b71c3d8fdea
+/* This patch depends on statuscmd patch and adds integration with a (patched)
+ * dwmblocks instance to give a clickable status bar. One must not necessarily
+ * have to use dwmblocks for this feature, any status updater that has support
+ * for real-time signals (SIGRTMIN) can be used.
+ *
  * dwmblocks: https://github.com/torrinfail/dwmblocks
+ * https://dwm.suckless.org/patches/statuscmd/
  */
 #define BAR_DWMBLOCKS_PATCH 0
+
+/* Originally the dwmblocks + statuscmd patch used a user defined signal (SIGUSR1)
+ * for communicating with dwmblocks to indicate update signal and what button was
+ * pressed. The signalling was later changed to SIGRTMIN instead.
+ *
+ * Ultimately this makes dwmblocks instances that were patched with the old patch
+ * are incompatible with the new dwm patch and vice versa.
+ *
+ * This is a compatibility patch that makes dwm use SIGUSR1 instead of SIGRTMIN so
+ * if button clicks are not working then you may want to try enabling this.
+ *
+ * If dwmblocks happen to die like this when clicking on a status
+ *
+ *    [1]    54355 user-defined signal 1  dwmblocks
+ *
+ * then it suggests that dwmblocks does not support user defined signals and this
+ * patch should be left disabled.
+ *
+ * Patch: https://gist.github.com/danbyl/54f7c1d57fc6507242a95b71c3d8fdea
+ * https://dwm.suckless.org/patches/statuscmd/
+ */
+#define BAR_DWMBLOCKS_SIGUSR1_PATCH 0
 
 /* This patch shows the titles of all visible windows in the status bar
  * (as opposed to showing only the selected one).
@@ -130,6 +155,24 @@
 /* Show tag symbols in bar */
 #define BAR_TAGS_PATCH 0
 
+/* This patch adds the window icon next to the window title in the bar.
+ *
+ * The patch depends on Imlib2 for icon scaling.
+ * You need to uncomment the corresponding line in config.mk to use the -lImlib2 library
+ *
+ * Arch Linux:
+ *     sudo pacman -S imlib2
+ * Debian:
+ *     sudo apt install libimlib2-dev
+ *
+ * The author recommends adding the compiler flags of -O3 and -march=native to enable auto loop
+ * vectorize for better performance.
+ *
+ * https://github.com/AdamYuan/dwm-winicon
+ * https://dwm.suckless.org/patches/winicon
+ */
+#define BAR_WINICON_PATCH 0
+
 /* Show window title in bar */
 #define BAR_WINTITLE_PATCH 0
 
@@ -198,11 +241,17 @@
  * togglebar affect the external bar in the same way.
  *
  * NB: Unless you want both anybar + dwm bar(s) then the recommendation is to disable all
- * bar modules and have { 0 } in the barrules.
+ * bar modules and have { -2 } in the barrules.
  *
  * https://dwm.suckless.org/patches/anybar/
  */
 #define BAR_ANYBAR_PATCH 1
+
+/* Anybar option to place the next bar depending on previous bar's position (top or bottom) */
+#define BAR_ANYBAR_TOP_AND_BOTTOM_BARS_PATCH 0
+
+/* Anybar option to let dwm manage the width of the bar */
+#define BAR_ANYBAR_MANAGE_WIDTH_PATCH 0
 
 /* This patch adds a border around the status bar(s) just like the border of client windows.
  * https://codemadness.org/paste/dwm-border-bar.patch
@@ -444,6 +493,12 @@
  * https://dwm.suckless.org/patches/decoration_hints/
  */
 #define DECORATION_HINTS_PATCH 0
+
+/* This feature distributes all clients on the current monitor evenly across all tags.
+ * It is a variant of the reorganizetags patch.
+ * https://dwm.suckless.org/patches/reorganizetags/
+ */
+#define DISTRIBUTETAGS_PATCH 0
 
 /* Similarly to the dragmfact patch this allows you to click and drag clients to change the
  * cfact to adjust the client's size in the stack. This patch depends on the cfacts patch.
@@ -697,7 +752,7 @@
  */
 #define NO_TRANSPARENT_BORDERS_PATCH 0
 
-/* Port of InstantVM's on_empty_keys functionality allowing keybindings that apply only when
+/* Port of InstantWM's on_empty_keys functionality allowing keybindings that apply only when
  * a tag is empty. An example use case is being able to launch applications with first hand
  * keys like "f" to launch firefox.
  *
@@ -720,6 +775,11 @@
  * https://dwm.suckless.org/patches/pertag/
  */
 #define PERTAG_PATCH 0
+
+/* Option to store gaps on a per tag basis rather than on a per monitor basis.
+ * Depends on both pertag and vanitygaps patches being enabled.
+ */
+#define PERTAG_VANITYGAPS_PATCH 0
 
 /* This controls whether or not to also store bar position on a per
  * tag basis, or leave it as one bar per monitor.
@@ -789,7 +849,7 @@
 /* This patch adds rounded corners to client windows in dwm.
  * You need to uncomment the corresponding line in config.mk to use the -lXext library
  * when including this patch. You will also want to set "borderpx = 0;" in your config.h.
- * https://github.com/mitchweaver/suckless/blob/master/dwm/patches_mitch/mitch-06-rounded_corners-db6093f6ec1bb884f7540f2512935b5254750b30.patch
+ * https://github.com/mitchweaver/suckless/blob/master/dwm/patches/mitch-06-rounded_corners-f04cac6d6e39cd9e3fc4fae526e3d1e8df5e34b2.patch
  */
 #define ROUNDED_CORNERS_PATCH 0
 
@@ -1029,6 +1089,31 @@
  */
 #define TOGGLEFULLSCREEN_PATCH 0
 
+/* Minor patch that lets you use the same keyboard shortcut to toggle to the previous layout if the
+ * designated layout is already active.
+ *
+ * This allows you to use e.g. MOD+m to change to the monocle layout and use the same keybinding to
+ * toggle back to what it was previously. The default behaviour in dwm forces you to use either
+ * MOD+space or MOD+t to change back to tiled layout.
+ *
+ * https://github.com/bakkeby/patches/wiki/togglelayout
+ */
+
+#define TOGGLELAYOUT_PATCH 0
+
+/* Minor patch that lets you use the same keyboard shortcut to toggle to the previous tag if the
+ * designated tag is already active.
+ *
+ * This allows you to use e.g. MOD+4 to quickly view the 4th tag and use the same keybinding to
+ * toggle back to what it was previously. The default behaviour in dwm forces you to use either
+ * MOD+tab or MOD+1 to change back to the previous tag.
+ *
+ * Idea ref.
+ * https://www.reddit.com/r/suckless/comments/ik27vd/key_toggle_between_next_and_previous_tag_dwm/
+ * https://github.com/bakkeby/patches/wiki/toggletag
+ */
+#define TOGGLETAG_PATCH 0
+
 /* Lets you transfer the currently focused client between the master and stack area
  * while increasing or decreasing the master area (nmaster) accordingly.
  * https://dwm.suckless.org/patches/transfer/
@@ -1065,14 +1150,6 @@
  */
 #define VIEWONTAG_PATCH 0
 
-/* By default tags can be changed using MOD+<num> while MOD+Tab toggles between the current and
- * the previous tag. This patch changes this so that if you hit MOD+<num> for the tag you are
- * currently on, then it works the same as MOD+Tab and switches back to the previous tag.
- * Idea ref.
- * https://www.reddit.com/r/suckless/comments/ik27vd/key_toggle_between_next_and_previous_tag_dwm/
- */
-#define VIEW_SAME_TAG_GIVES_PREVIOUS_TAG_PATCH 0
-
 /* This patch warps the mouse cursor to the center of the currently focused window or screen
  * when the mouse cursor is (a) on a different screen or (b) on top of a different window.
  * https://dwm.suckless.org/patches/warp/
@@ -1093,6 +1170,13 @@
  * http://dwm.suckless.org/patches/winview/
  */
 #define WINVIEW_PATCH 0
+
+/* Remember keyboard layout per client.
+ * It is recommended that you configure xkb before using this patch as described in
+ * https://www.x.org/archive/X11R7.5/doc/input/XKB-Config.html
+ * https://dwm.suckless.org/patches/xkb/
+ */
+#define XKB_PATCH 0
 
 /* Allows dwm to read colors from xrdb (.Xresources) during runtime. Compatible with
  * the float border color, awesomebar, urgentborder and titlecolor patches.
@@ -1191,3 +1275,4 @@
  * This can be optionally disabled in favour of other layouts.
  */
 #define MONOCLE_LAYOUT 1
+

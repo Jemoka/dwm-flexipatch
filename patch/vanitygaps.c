@@ -1,7 +1,7 @@
 /* Settings */
-#if !PERTAG_PATCH
+#if !PERTAG_VANITYGAPS_PATCH
 static int enablegaps = 1;
-#endif // PERTAG_PATCH
+#endif // PERTAG_VANITYGAPS_PATCH
 
 static void
 setgaps(int oh, int ov, int ih, int iv)
@@ -15,6 +15,12 @@ setgaps(int oh, int ov, int ih, int iv)
 	selmon->gappov = ov;
 	selmon->gappih = ih;
 	selmon->gappiv = iv;
+
+	#if PERTAG_VANITYGAPS_PATCH && PERTAG_PATCH
+	selmon->pertag->gaps[selmon->pertag->curtag] =
+		((oh & 0xFF) << 0) | ((ov & 0xFF) << 8) | ((ih & 0xFF) << 16) | ((iv & 0xFF) << 24);
+	#endif // PERTAG_VANITYGAPS_PATCH
+
 	arrange(selmon);
 }
 
@@ -60,13 +66,13 @@ setgapsex(const Arg *arg)
 		iv = (arg->i & 0x7f);
 
 	/* Auto enable gaps if disabled */
-	#if PERTAG_PATCH
+	#if PERTAG_VANITYGAPS_PATCH && PERTAG_PATCH
 	if (!selmon->pertag->enablegaps[selmon->pertag->curtag])
 		selmon->pertag->enablegaps[selmon->pertag->curtag] = 1;
 	#else
 	if (!enablegaps)
 		enablegaps = 1;
-	#endif // PERTAG_PATCH
+	#endif // PERTAG_VANITYGAPS_PATCH
 
 	setgaps(oh, ov, ih, iv);
 }
@@ -75,11 +81,11 @@ setgapsex(const Arg *arg)
 static void
 togglegaps(const Arg *arg)
 {
-	#if PERTAG_PATCH
+	#if PERTAG_VANITYGAPS_PATCH && PERTAG_PATCH
 	selmon->pertag->enablegaps[selmon->pertag->curtag] = !selmon->pertag->enablegaps[selmon->pertag->curtag];
 	#else
 	enablegaps = !enablegaps;
-	#endif // PERTAG_PATCH
+	#endif // PERTAG_VANITYGAPS_PATCH
 	arrange(NULL);
 }
 
@@ -171,16 +177,16 @@ static void
 getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
 {
 	unsigned int n, oe, ie;
-	#if PERTAG_PATCH
+	#if PERTAG_VANITYGAPS_PATCH && PERTAG_PATCH
 	oe = ie = selmon->pertag->enablegaps[selmon->pertag->curtag];
 	#else
 	oe = ie = enablegaps;
-	#endif // PERTAG_PATCH
+	#endif // PERTAG_VANITYGAPS_PATCH
 	Client *c;
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	if (smartgaps && n == 1) {
-		oe = 0; // outer gaps disabled when only one client
+	if (n == 1) {
+		oe *= smartgaps_fact; // outer gaps disabled or multiplied when only one client
 	}
 
 	*oh = m->gappoh*oe; // outer horizontal gap
@@ -190,3 +196,4 @@ getgaps(Monitor *m, int *oh, int *ov, int *ih, int *iv, unsigned int *nc)
 	*nc = n;            // number of clients
 }
 #endif
+

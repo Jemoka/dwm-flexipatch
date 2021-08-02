@@ -57,6 +57,7 @@ rioposition(Client *c, int x, int y, int w, int h)
 	if ((m = recttomon(x, y, w, h)) && m != c->mon) {
 		detach(c);
 		detachstack(c);
+		arrange(c->mon);
 		c->mon = m;
 		c->tags = m->tagset[m->seltags];
 		attach(c);
@@ -101,3 +102,4 @@ riospawnsync(const Arg *arg)
 	if (riodraw(NULL, slopspawnstyle))
 		riopid = spawncmd(arg);
 }
+

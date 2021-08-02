@@ -19,9 +19,10 @@ struct Pertag {
 	#if ZOOMSWAP_PATCH
 	Client *prevzooms[NUMTAGS + 1]; /* store zoom information */
 	#endif // ZOOMSWAP_PATCH
-	#if VANITYGAPS_PATCH
+	#if PERTAG_VANITYGAPS_PATCH && VANITYGAPS_PATCH
 	int enablegaps[NUMTAGS + 1];
-	#endif // VANITYGAPS_PATCH
+	unsigned int gaps[NUMTAGS + 1];
+	#endif // PERTAG_VANITYGAPS_PATCH | VANITYGAPS_PATCH
 };
 
 void
@@ -56,6 +57,13 @@ pertagview(const Arg *arg)
 	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
 
+	#if PERTAG_VANITYGAPS_PATCH && VANITYGAPS_PATCH
+	selmon->gappoh = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff) >> 0;
+	selmon->gappov = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff00) >> 8;
+	selmon->gappih = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff0000) >> 16;
+	selmon->gappiv = (selmon->pertag->gaps[selmon->pertag->curtag] & 0xff000000) >> 24;
+	#endif // PERTAG_VANITYGAPS_PATCH | VANITYGAPS_PATCH
+
 	#if FLEXTILE_DELUXE_LAYOUT
 	selmon->ltaxis[LAYOUT] = selmon->pertag->ltaxis[selmon->pertag->curtag][LAYOUT];
 	selmon->ltaxis[MASTER] = selmon->pertag->ltaxis[selmon->pertag->curtag][MASTER];
@@ -67,3 +75,4 @@ pertagview(const Arg *arg)
 		togglebar(NULL);
 	#endif // PERTAGBAR_PATCH
 }
+

@@ -146,7 +146,7 @@ getschemefor(Monitor *m, int group, int activegroup)
 		#endif // MONOCLE_LAYOUT
 		return SchemeTitleNorm;
 	case GRP_HIDDEN:
-		return SchemeHid;
+		return SchemeHidNorm;
 	case GRP_FLOAT:
 		return (activegroup ? SchemeFlexActFloat : SchemeFlexInaFloat);
 	}
@@ -172,10 +172,12 @@ flextitledraw(Monitor *m, Client *c, int unused, int x, int w, int tabscheme, Ar
 		return;
 	int i, nclienttags = 0, nviewtags = 0, pad = lrpad / 2;
 	int clientscheme = (
-		c == selmon->sel
-		? getselschemefor(tabscheme)
+		c == selmon->sel && HIDDEN(c)
+		? SchemeHidSel
 		: HIDDEN(c)
-		? SchemeHid
+		? SchemeHidNorm
+		: c == selmon->sel
+		? getselschemefor(tabscheme)
 		: c->isurgent
 		? SchemeUrg
 		: tabscheme
@@ -189,7 +191,14 @@ flextitledraw(Monitor *m, Client *c, int unused, int x, int w, int tabscheme, Ar
 		pad = (w - TEXTW(c->name) + lrpad) / 2;
 	#endif // BAR_CENTEREDWINDOWNAME_PATCH
 
+	#if BAR_WINICON_PATCH
+	drw_text(drw, x, barg->y, w, barg->h, pad + (c->icon ? c->icon->width + ICONSPACING : 0), c->name, 0, False);
+	if (c->icon)
+		drw_img(drw, x + pad, barg->y + (barg->h - c->icon->height) / 2, c->icon, tmpicon);
+	#else
 	drw_text(drw, x, barg->y, w, barg->h, pad, c->name, 0, False);
+	#endif // BAR_WINICON_PATCH
+
 	drawstateindicator(m, c, 1, x + 2, barg->y, w, barg->h, 0, 0, 0);
 
 	if (FLEXWINTITLE_BORDERS) {
@@ -434,3 +443,4 @@ flextitlecalculate(
 	}
 	return 1;
 }
+
