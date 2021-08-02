@@ -462,7 +462,7 @@ static const Inset default_inset = {
  *    name - does nothing, intended for visual clue and for logging / debugging
  */
 
-static const BarRule barrules[] = { -2 };
+static const BarRule barrules[] = { {-2} };
 
 
 /* layout(s) */
